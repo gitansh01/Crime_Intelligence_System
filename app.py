@@ -184,109 +184,237 @@ h4 { font-size:1.3rem !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TABLE BUTTONS - MAXIMUM VISIBILITY (RED FULLSCREEN, BLUE DOWNLOAD)
+   DATAFRAME TOOLBAR BUTTONS — FULLSCREEN (RED) & DOWNLOAD (BLUE)
+   Targets the icon-buttons that appear in the top-right corner
+   of every st.dataframe / st.table widget.
    ═══════════════════════════════════════════════════════════════ */
+
+/* Toolbar wrapper - make it always visible */
+[data-testid="stDataFrame"] [data-testid="stElementToolbar"],
+[data-testid="stDataFrame"] [data-testid="StyledFullScreenButton"],
+[data-testid="stDataFrame"] > div:first-child > div:last-child,
+.stDataFrame [data-testid="stElementToolbar"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: rgba(10,10,30,0.95) !important;
+    border: 2px solid #dc143c !important;
+    border-radius: 10px !important;
+    padding: 4px !important;
+}
+
+/* ALL toolbar icon buttons inside dataframe */
+[data-testid="stDataFrame"] button,
+[data-testid="stDataFrame"] [data-testid="stElementToolbar"] button,
+[data-testid="stElementToolbar"] button {
+    background: #dc143c !important;
+    color: #ffffff !important;
+    border: 3px solid #ffffff !important;
+    border-radius: 8px !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    padding: 8px 10px !important;
+    margin: 2px !important;
+    box-shadow: 0 4px 14px rgba(220,20,60,0.8) !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+}
+
+[data-testid="stDataFrame"] button:hover,
+[data-testid="stElementToolbar"] button:hover {
+    background: #ff0000 !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 6px 20px rgba(220,20,60,1) !important;
+}
+
+/* SVG icons inside toolbar buttons — white */
+[data-testid="stDataFrame"] button svg,
+[data-testid="stElementToolbar"] button svg {
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
+    color: #ffffff !important;
+    width: 18px !important;
+    height: 18px !important;
+}
+
+/* ── Second button (Download) override to BLUE ── */
+[data-testid="stDataFrame"] button:nth-of-type(2),
+[data-testid="stElementToolbar"] button:nth-of-type(2) {
+    background: #0066cc !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: 0 4px 14px rgba(0,102,204,0.8) !important;
+}
+
+[data-testid="stDataFrame"] button:nth-of-type(2):hover,
+[data-testid="stElementToolbar"] button:nth-of-type(2):hover {
+    background: #0080ff !important;
+    box-shadow: 0 6px 20px rgba(0,102,204,1) !important;
+}
+
+/* Legacy selectors for older Streamlit versions */
 button[title="View fullscreen"],
 button[aria-label="View fullscreen"],
 button[title*="fullscreen"],
 button[aria-label*="fullscreen"] {
-    background:#dc143c !important; 
-    color:#ffffff !important;
-    border:5px solid #ffffff !important; 
-    border-radius:10px !important;
-    font-weight:900 !important; 
-    opacity:1 !important; 
-    visibility:visible !important;
-    padding:14px 20px !important; 
-    font-size:1.15rem !important;
-    box-shadow: 0 10px 24px rgba(220,20,60,1) !important;
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
-    z-index:9999 !important;
+    background: #dc143c !important; 
+    color: #ffffff !important;
+    border: 4px solid #ffffff !important; 
+    border-radius: 10px !important;
+    font-weight: 900 !important; 
+    opacity: 1 !important; 
+    visibility: visible !important;
+    padding: 10px 14px !important; 
+    font-size: 1.1rem !important;
+    box-shadow: 0 8px 20px rgba(220,20,60,1) !important;
+    z-index: 9999 !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+}
+
+button[title="View fullscreen"] svg,
+button[aria-label="View fullscreen"] svg {
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
 }
 
 button[title="Download"],
 button[aria-label="Download"],
 button[title*="download"],
 button[aria-label*="download"] {
-    background:#0066cc !important; 
-    color:#ffffff !important;
-    border:5px solid #ffffff !important; 
-    border-radius:10px !important;
-    font-weight:900 !important; 
-    opacity:1 !important; 
-    visibility:visible !important;
-    padding:14px 20px !important; 
-    font-size:1.15rem !important;
-    box-shadow: 0 10px 24px rgba(0,102,204,1) !important;
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
-    z-index:9999 !important;
+    background: #0066cc !important; 
+    color: #ffffff !important;
+    border: 4px solid #ffffff !important; 
+    border-radius: 10px !important;
+    font-weight: 900 !important; 
+    opacity: 1 !important; 
+    visibility: visible !important;
+    padding: 10px 14px !important; 
+    font-size: 1.1rem !important;
+    box-shadow: 0 8px 20px rgba(0,102,204,1) !important;
+    z-index: 9999 !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+}
+
+button[title="Download"] svg,
+button[aria-label="Download"] svg {
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DATAFRAME / TABLE - COMPLETE VISIBILITY FIX
+   DATAFRAME / TABLE — COMPLETE DARK BACKGROUND FIX
+   Forces the white default background to near-black everywhere
    ═══════════════════════════════════════════════════════════════ */
 
-/* Table Container - ALMOST BLACK */
-[data-testid="stDataFrame"] {
-    background:rgba(0,0,0,0.98) !important; 
-    border-radius:14px; 
-    border:4px solid #dc143c;
-    box-shadow:0 16px 44px rgba(0,0,0,0.9); 
-    padding-top:12px !important;
+/* Outermost dataframe container */
+[data-testid="stDataFrame"],
+[data-testid="stDataFrame"] > div,
+[data-testid="stDataFrame"] > div > div,
+[data-testid="stDataFrame"] iframe {
+    background: rgba(5,5,15,0.98) !important;
+    border-radius: 14px !important;
+    border: 4px solid #dc143c !important;
+    box-shadow: 0 16px 44px rgba(0,0,0,0.9) !important;
 }
 
-/* YEAR/Index Column (FIRST COLUMN) - PURE BLACK with BRIGHT WHITE text */
-[data-testid="stDataFrame"] [role="gridcell"]:first-child {
-    background:rgba(0,0,0,1) !important;
-    color:#ffffff !important;
-    -webkit-text-fill-color:#ffffff !important;
-    font-weight:900 !important;
-    font-size:1.1rem !important;
-    text-shadow: 4px 4px 12px rgba(0,0,0,1), 0 0 8px rgba(255,255,255,0.3) !important;
-    border-right: 5px solid #dc143c !important;
-    padding: 16px !important;
+/* The inner Glide/AG-grid canvas element */
+[data-testid="stDataFrame"] canvas {
+    background: rgba(5,5,15,0.98) !important;
 }
 
-[data-testid="stDataFrame"] th:first-child {
-    background:rgba(0,0,0,1) !important;
-    color:#ffffff !important;
-    -webkit-text-fill-color:#ffffff !important;
-    font-weight:900 !important;
-    font-size:1.1rem !important;
-    text-shadow: 4px 4px 12px rgba(0,0,0,1), 0 0 8px rgba(255,255,255,0.3) !important;
-    border-right: 5px solid #dc143c !important;
-    padding: 16px !important;
+/* Scrollable viewport wrappers */
+[data-testid="stDataFrame"] [class*="dvn-scroller"],
+[data-testid="stDataFrame"] [class*="scroll"],
+[data-testid="stDataFrame"] [class*="container"],
+[data-testid="stDataFrame"] [class*="wrapper"],
+[data-testid="stDataFrame"] [class*="viewport"] {
+    background: rgba(5,5,15,0.98) !important;
 }
 
-/* All Table Headers - DARK BACKGROUND + BRIGHT WHITE TEXT */
+/* Table header row */
 [data-testid="stDataFrame"] th,
-[data-testid="stDataFrame"] [role="columnheader"] {
-    background:rgba(5,5,15,0.98) !important;
-    color:#ffffff !important;
-    -webkit-text-fill-color:#ffffff !important;
-    font-weight:900 !important;
-    font-size:1.05rem !important;
-    text-shadow: 3px 3px 10px rgba(0,0,0,1), 0 0 6px rgba(255,255,255,0.2) !important;
-    padding:16px 12px !important;
-    border-bottom: 5px solid #dc143c !important;
+[data-testid="stDataFrame"] [role="columnheader"],
+[data-testid="stDataFrame"] thead th,
+[data-testid="stDataFrame"] thead tr {
+    background: rgba(20,0,50,0.98) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 1.05rem !important;
+    text-shadow: 2px 2px 8px rgba(0,0,0,1) !important;
+    padding: 14px 12px !important;
+    border-bottom: 4px solid #dc143c !important;
+    border-right: 1px solid rgba(220,20,60,0.3) !important;
 }
 
-/* All Data Cells - BRIGHT WHITE TEXT with SHADOW */
+/* Index / first-column header */
+[data-testid="stDataFrame"] th:first-child,
+[data-testid="stDataFrame"] [role="columnheader"]:first-child {
+    background: rgba(30,0,60,0.98) !important;
+    border-right: 4px solid #dc143c !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Data cells */
 [data-testid="stDataFrame"] td,
 [data-testid="stDataFrame"] [role="gridcell"] {
-    color:#ffffff !important;
-    -webkit-text-fill-color:#ffffff !important;
-    font-weight:900 !important;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.98), 0 0 4px rgba(255,255,255,0.15) !important;
-    font-size:1rem !important;
+    background: rgba(8,8,25,0.97) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.95) !important;
+    border-bottom: 1px solid rgba(220,20,60,0.2) !important;
+    border-right: 1px solid rgba(220,20,60,0.15) !important;
+    padding: 12px !important;
 }
 
-/* Force ALL table text elements BRIGHT WHITE */
+/* Index / first-column cells */
+[data-testid="stDataFrame"] td:first-child,
+[data-testid="stDataFrame"] [role="gridcell"]:first-child {
+    background: rgba(20,0,45,0.98) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 900 !important;
+    border-right: 4px solid #dc143c !important;
+}
+
+/* Alternating row tint */
+[data-testid="stDataFrame"] tr:nth-child(even) td,
+[data-testid="stDataFrame"] [role="row"]:nth-child(even) [role="gridcell"] {
+    background: rgba(15,5,35,0.97) !important;
+}
+
+/* Row hover */
+[data-testid="stDataFrame"] tr:hover td,
+[data-testid="stDataFrame"] [role="row"]:hover [role="gridcell"] {
+    background: rgba(220,20,60,0.18) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Force ALL text inside dataframe to white */
 [data-testid="stDataFrame"] *,
 [data-testid="stDataFrame"] span,
-[data-testid="stDataFrame"] div {
-    color:#ffffff !important;
-    -webkit-text-fill-color:#ffffff !important;
+[data-testid="stDataFrame"] div:not([data-testid="stElementToolbar"]) {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Scrollbar styling */
+[data-testid="stDataFrame"] ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: rgba(10,10,30,0.9);
+}
+[data-testid="stDataFrame"] ::-webkit-scrollbar-thumb {
+    background: #dc143c;
+    border-radius: 4px;
+}
+[data-testid="stDataFrame"] ::-webkit-scrollbar-corner {
+    background: rgba(10,10,30,0.9);
 }
 
 /* Tabs */
@@ -585,6 +713,21 @@ def dark_layout(title="", h=460, dtick_x=1):
             font=dict(color='#ffffff', size=14, family='Arial Black')
         )
     )
+
+
+# ═══════════════════════════════════════════════════════
+# MODULE 1 — NATIONAL OVERVIEW
+# ═══════════════════════════════════════════════════════
+if "National Overview" in menu:
+    st.markdown("<h2>🏠 NATIONAL CRIME OVERVIEW</h2>", unsafe_allow_html=True)
+    latest  = df_state[df_state["YEAR"]==YEARS[-1]]
+    prev    = df_state[df_state["YEAR"]==YEARS[-2]]
+    total_l = int(latest["TOTAL IPC CRIMES"].sum())
+    total_p = int(prev["TOTAL IPC CRIMES"].sum())
+    yoy_pct = (total_l-total_p)/total_p*100
+    worst   = latest.loc[latest["TOTAL IPC CRIMES"].idxmax(),"STATE/UT"]
+    safest  = latest.loc[latest["TOTAL IPC CRIMES"].idxmin(),"STATE/UT"]
+    top_cat = latest[PLOT_CRIMES].sum().idxmax()
     all_total = int(df_state["TOTAL IPC CRIMES"].sum())
 
     kpi_data = [
@@ -670,7 +813,8 @@ def dark_layout(title="", h=460, dtick_x=1):
                    "ROBBERY","THEFT","BURGLARY","RIOTS","DOWRY DEATHS"]
     styled_rank = rank_df.style.background_gradient(cmap='Reds',subset=subset_cols)\
         .set_properties(**{'color':'white','font-weight':'bold',
-                           '-webkit-text-fill-color':'white'})
+                           '-webkit-text-fill-color':'white',
+                           'background-color':'rgba(8,8,25,0.97)'})
     st.dataframe(styled_rank, use_container_width=True, height=420)
 
 
@@ -872,7 +1016,8 @@ elif "State-wise" in menu:
     with ts5:
         disp = ["YEAR"]+PLOT_CRIMES+["TOTAL IPC CRIMES"]
         styled_s = sdf[disp].style.background_gradient(cmap='Reds',subset=PLOT_CRIMES+["TOTAL IPC CRIMES"])\
-            .set_properties(**{'color':'white','font-weight':'bold','-webkit-text-fill-color':'white'})
+            .set_properties(**{'color':'white','font-weight':'bold','-webkit-text-fill-color':'white',
+                               'background-color':'rgba(8,8,25,0.97)'})
         st.dataframe(styled_s,use_container_width=True,height=400)
         st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
         st.download_button(f"📥 Download {sel_state.title()} Data",
@@ -929,7 +1074,7 @@ elif "National Trend" in menu:
                          f"{series.min():,}",f"{series.max():,}",
                          f"{series.max()-series.min():,}",f"{growth_rate:+.2f}%"]})
             styled_stats = stats.style.set_properties(**{'color':'white','font-weight':'bold',
-                '-webkit-text-fill-color':'white','background-color':'rgba(10,10,40,0.7)'})
+                '-webkit-text-fill-color':'white','background-color':'rgba(8,8,25,0.97)'})
             st.dataframe(styled_stats,use_container_width=True,hide_index=True)
         with cs2:
             st.markdown("<h4>📈 YEAR-ON-YEAR CHANGES</h4>", unsafe_allow_html=True)
@@ -953,7 +1098,8 @@ elif "National Trend" in menu:
             .background_gradient(cmap='Reds',subset=PLOT_CRIMES+["TOTAL IPC CRIMES"])\
             .set_properties(**{'color':'white','font-weight':'bold',
                                '-webkit-text-fill-color':'white',
-                               'text-shadow':'1px 1px 4px rgba(0,0,0,0.95)'})\
+                               'text-shadow':'1px 1px 4px rgba(0,0,0,0.95)',
+                               'background-color':'rgba(8,8,25,0.97)'})\
             .format({"YEAR": "{:.0f}"})
         st.dataframe(styled_n,use_container_width=True,height=420)
         st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
@@ -995,7 +1141,6 @@ elif "AI Prediction" in menu:
             lower     = int(predicted*0.88)
             upper     = int(predicted*1.12)
 
-            # Risk from existing model
             enc_val    = label_enc.transform([pred_state])[0]
             X_risk     = pd.DataFrame({'State_Encoded':[enc_val]})
             risk_score = float(risk_model.predict(X_risk)[0])
@@ -1027,35 +1172,29 @@ elif "AI Prediction" in menu:
             st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
             st.markdown("---")
 
-            # Chart: Historical + multi-year forecast 2026-2035
             hist_sdf = df_state[df_state["STATE/UT"]==pred_state].sort_values("YEAR")
             future_years = list(range(2026, 2036))
             future_preds = [float(m.predict([[y]])[0]) for y in future_years]
 
             fig_fc = go.Figure()
-            # Historical
             fig_fc.add_trace(go.Scatter(
                 x=hist_sdf["YEAR"], y=hist_sdf[pred_crime], mode='lines+markers',
                 name='Historical (2001–2012)', line=dict(color='#00ccff',width=5),
                 marker=dict(size=11,color='#0099ff'),
                 hovertemplate='<b>%{x}</b><br>Actual: %{y:,}<extra></extra>'))
-            # Gap connector
             fig_fc.add_trace(go.Scatter(
                 x=[YEARS[-1],2026], y=[float(hist_sdf[pred_crime].iloc[-1]),future_preds[0]],
                 mode='lines', showlegend=False, line=dict(color='rgba(255,100,0,0.4)',width=2,dash='dot')))
-            # Confidence band
             fig_fc.add_trace(go.Scatter(
                 x=future_years+future_years[::-1],
                 y=[int(p*1.12) for p in future_preds]+[int(p*0.88) for p in future_preds[::-1]],
                 fill='toself',fillcolor='rgba(255,200,0,0.15)',
                 line=dict(color='rgba(255,200,0,0)'),name='Confidence Band ±12%'))
-            # Forecast line
             fig_fc.add_trace(go.Scatter(
                 x=future_years, y=future_preds, mode='lines+markers',
                 name=f'Forecast 2026–2035', line=dict(color='#ff4400',width=4,dash='dash'),
                 marker=dict(size=10,color='#ffcc00',symbol='diamond',line=dict(color='#ff0000',width=2)),
                 hovertemplate='<b>%{x}</b><br>Forecast: %{y:,}<extra></extra>'))
-            # Highlight selected year
             fig_fc.add_trace(go.Scatter(
                 x=[pred_year], y=[predicted], mode='markers', name=f'{pred_year} Target',
                 marker=dict(size=30,color='#ffff00',symbol='star',line=dict(color='#ff0000',width=3)),
@@ -1069,7 +1208,6 @@ elif "AI Prediction" in menu:
                              annotation_font_color="rgba(255,255,255,0.7)")
             st.plotly_chart(fig_fc, use_container_width=True)
 
-            # Multi-crime forecast for selected state + year
             st.markdown("---")
             st.markdown(f"<h3>📊 All Crime Types — {pred_state.title()} Forecast for {pred_year}</h3>", unsafe_allow_html=True)
             multi_crimes = PLOT_CRIMES + ["TOTAL IPC CRIMES"]
@@ -1093,7 +1231,6 @@ elif "AI Prediction" in menu:
             fig_mc.update_layout(**lay_mc)
             st.plotly_chart(fig_mc, use_container_width=True)
 
-            # Download
             dl_df = pd.DataFrame({"Year":future_years,"Predicted":future_preds,
                 "Lower":[int(p*0.88) for p in future_preds],
                 "Upper":[int(p*1.12) for p in future_preds]})
@@ -1156,7 +1293,8 @@ elif "AI Prediction" in menu:
             .background_gradient(cmap='RdYlGn_r',subset=["Predicted Crimes","Risk Score"])\
             .set_properties(**{'color':'white','font-weight':'bold',
                                '-webkit-text-fill-color':'white',
-                               'text-shadow':'1px 1px 4px rgba(0,0,0,0.9)'})\
+                               'text-shadow':'1px 1px 4px rgba(0,0,0,0.9)',
+                               'background-color':'rgba(8,8,25,0.97)'})\
             .set_properties(subset=["State/UT"],
                 **{'color':'white','font-weight':'900','-webkit-text-fill-color':'white',
                    'background-color':'rgba(20,0,40,0.5)'})\
@@ -1201,7 +1339,6 @@ elif "AI Prediction" in menu:
             fig_tl.update_layout(**ly_tl)
             st.plotly_chart(fig_tl, use_container_width=True)
 
-            # Table: All selected states × all future years
             st.markdown("<h4>📋 Forecast Data Table (2026–2035)</h4>", unsafe_allow_html=True)
             rows = []
             for st_name in tl_states:
@@ -1214,7 +1351,8 @@ elif "AI Prediction" in menu:
             styled_tl = tl_df.style\
                 .background_gradient(cmap='Reds',axis=None)\
                 .set_properties(**{'color':'white','font-weight':'bold',
-                                   '-webkit-text-fill-color':'white'})
+                                   '-webkit-text-fill-color':'white',
+                                   'background-color':'rgba(8,8,25,0.97)'})
             st.dataframe(styled_tl,use_container_width=True,height=300)
             st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
             st.download_button("📥 Download Forecast Timeline",
