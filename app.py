@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
 import joblib
 import warnings
 warnings.filterwarnings("ignore")
@@ -15,548 +14,126 @@ st.set_page_config(
 )
 
 # ═══════════════════════════════════════════════════════════════════
-# OPTIMIZED CSS - MAXIMUM VISIBILITY FOR ALL ELEMENTS
+# CSS
 # ═══════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
-/* Main Background */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg,#0a0a1e 0%,#1a1a3c 25%,#0f0f28 50%,#1e1e46 75%,#0a0a1e 100%);
     color:#FFFFFF;
 }
-
-/* Sidebar */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg,#0a0a1e 0%,#1a1a3c 50%,#0f0f28 100%);
     border-right:4px solid #dc143c;
 }
-[data-testid="stSidebar"] * { 
-    color:#ffffff !important; 
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.95);
-}
-
-/* All Text - Maximum Contrast */
-label,.stMarkdown,.stText,p,span,div { 
-    color:#ffffff !important; 
-    text-shadow:2px 2px 5px rgba(0,0,0,0.95); 
-}
-
-/* Selectbox Label - BRIGHT WHITE */
-.stSelectbox label { 
-    color:#ffffff !important; 
-    font-weight:900 !important; 
-    font-size:1.15rem !important; 
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
-}
-
-/* Selectbox Dropdown - BLACK BACKGROUND + BRIGHT WHITE TEXT */
+[data-testid="stSidebar"] * { color:#ffffff !important; text-shadow:2px 2px 4px rgba(0,0,0,0.95); }
+label,.stMarkdown,.stText,p,span,div { color:#ffffff !important; text-shadow:2px 2px 5px rgba(0,0,0,0.95); }
+.stSelectbox label { color:#ffffff !important; font-weight:900 !important; font-size:1.15rem !important; }
 .stSelectbox div[data-baseweb="select"] > div {
-    background-color:#000000 !important; 
-    color:#ffffff !important;
-    border:4px solid #dc143c !important; 
-    font-weight:900 !important;
-    font-size:1.25rem !important; 
-    min-height:54px !important;
-    text-shadow:2px 2px 6px rgba(0,0,0,1);
+    background-color:#000000 !important; color:#ffffff !important;
+    border:4px solid #dc143c !important; font-weight:900 !important;
+    font-size:1.25rem !important; min-height:54px !important;
 }
-
 .stSelectbox div[data-baseweb="select"] span,
-.stSelectbox div[data-baseweb="select"] div[class*="singleValue"],
-.stSelectbox [class*="ValueContainer"] *,
 .stSelectbox [class*="singleValue"],
+.stSelectbox [class*="ValueContainer"] *,
 .stSelectbox [class*="placeholder"],
-.stSelectbox input {
-    color:#ffffff !important; 
-    font-weight:900 !important; 
-    -webkit-text-fill-color:#ffffff !important;
-    text-shadow:2px 2px 6px rgba(0,0,0,1);
-}
-
+.stSelectbox input { color:#ffffff !important; font-weight:900 !important; -webkit-text-fill-color:#ffffff !important; }
 .stSelectbox svg { fill:#dc143c !important; }
-
-/* Dropdown Menu - BLACK */
-[data-baseweb="popover"] { 
-    background-color:#000000 !important; 
-    border:4px solid #dc143c !important; 
-}
-
-/* Dropdown Options - BLACK with BRIGHT WHITE TEXT */
-.stSelectbox li,
-[data-baseweb="menu"] li,
-[role="option"] {
-    background-color:#000000 !important; 
-    color:#ffffff !important;
-    font-weight:900 !important; 
-    font-size:1.15rem !important;
-    padding:18px 26px !important; 
-    border-bottom:2px solid #333 !important;
+[data-baseweb="popover"] { background-color:#000000 !important; border:4px solid #dc143c !important; }
+.stSelectbox li,[data-baseweb="menu"] li,[role="option"] {
+    background-color:#000000 !important; color:#ffffff !important;
+    font-weight:900 !important; font-size:1.15rem !important;
+    padding:18px 26px !important; border-bottom:2px solid #333 !important;
     -webkit-text-fill-color:#ffffff !important;
-    text-shadow:2px 2px 6px rgba(0,0,0,1);
 }
-
-.stSelectbox li:hover,
-[role="option"]:hover { 
-    background:linear-gradient(135deg,#dc143c,#ff0000) !important; 
-}
-
-/* Headers - MAXIMUM VISIBILITY */
-h1 { 
-    color:#ffffff !important; 
-    text-shadow:6px 6px 12px rgba(0,0,0,1); 
-    font-size:2.8rem !important; 
-    font-weight:900 !important; 
-    text-align:center; 
-}
-
-h2,h3,h4 { 
-    color:#ffffff !important; 
-    font-weight:900 !important; 
-    text-shadow:4px 4px 10px rgba(0,0,0,1); 
-}
-
-h2 { font-size:1.8rem !important; } 
-h3 { font-size:1.5rem !important; } 
-h4 { font-size:1.3rem !important; }
-
-/* Metric Cards */
+.stSelectbox li:hover,[role="option"]:hover { background:linear-gradient(135deg,#dc143c,#ff0000) !important; }
+h1 { color:#ffffff !important; text-shadow:6px 6px 12px rgba(0,0,0,1); font-size:2.8rem !important; font-weight:900 !important; text-align:center; }
+h2,h3,h4 { color:#ffffff !important; font-weight:900 !important; text-shadow:4px 4px 10px rgba(0,0,0,1); }
+h2 { font-size:1.8rem !important; } h3 { font-size:1.5rem !important; } h4 { font-size:1.3rem !important; }
 [data-testid="metric-container"] {
     background:linear-gradient(135deg,rgba(220,20,60,0.4),rgba(139,0,0,0.3));
-    border:4px solid #dc143c; 
-    border-radius:15px; 
-    padding:25px; 
-    box-shadow:0 15px 40px rgba(220,20,60,0.6);
+    border:4px solid #dc143c; border-radius:15px; padding:25px; box-shadow:0 15px 40px rgba(220,20,60,0.6);
 }
-
-[data-testid="stMetricValue"] { 
-    font-size:2.5rem !important; 
-    font-weight:900 !important; 
-    color:#ff0000 !important; 
-    text-shadow:5px 5px 10px rgba(0,0,0,1); 
-}
-
-[data-testid="stMetricLabel"] { 
-    color:#ffffff !important; 
-    font-weight:800 !important; 
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
-}
-
-/* Regular Buttons */
+[data-testid="stMetricValue"] { font-size:2.5rem !important; font-weight:900 !important; color:#ff0000 !important; }
+[data-testid="stMetricLabel"] { color:#ffffff !important; font-weight:800 !important; }
 .stButton>button {
-    background:linear-gradient(135deg,#dc143c,#8b0000) !important; 
-    color:white !important;
-    font-weight:900 !important; 
-    font-size:1.15rem !important; 
-    border:4px solid #ff0000 !important;
-    border-radius:12px !important; 
-    padding:18px 42px !important; 
-    box-shadow:0 10px 24px rgba(220,20,60,0.7);
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
+    background:linear-gradient(135deg,#dc143c,#8b0000) !important; color:white !important;
+    font-weight:900 !important; font-size:1.15rem !important; border:4px solid #ff0000 !important;
+    border-radius:12px !important; padding:18px 42px !important; box-shadow:0 10px 24px rgba(220,20,60,0.7);
 }
-
-.stButton>button:hover { 
-    transform:translateY(-3px); 
-    box-shadow:0 14px 34px rgba(220,20,60,0.9); 
-}
-
-/* Download Buttons - HIGHLY VISIBLE BLUE */
+.stButton>button:hover { transform:translateY(-3px); }
 .stDownloadButton>button {
-    background:linear-gradient(135deg,#0066cc,#003d82) !important; 
-    color:#ffffff !important;
-    font-weight:900 !important; 
-    font-size:1.25rem !important; 
-    border:5px solid #ffffff !important;
-    border-radius:14px !important; 
-    padding:20px 44px !important; 
-    box-shadow:0 12px 30px rgba(0,102,204,0.8);
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
+    background:linear-gradient(135deg,#0066cc,#003d82) !important; color:#ffffff !important;
+    font-weight:900 !important; font-size:1.25rem !important; border:5px solid #ffffff !important;
+    border-radius:14px !important; padding:20px 44px !important; box-shadow:0 12px 30px rgba(0,102,204,0.8);
 }
-
-.stDownloadButton>button:hover { 
-    transform:translateY(-3px); 
-    background:linear-gradient(135deg,#0080ff,#0066cc) !important; 
-    box-shadow:0 16px 38px rgba(0,102,204,1);
+.stDownloadButton>button:hover { background:linear-gradient(135deg,#0080ff,#0066cc) !important; }
+.stTabs [data-baseweb="tab-list"] {
+    gap:12px; background:rgba(10,10,30,0.9); border-radius:16px; padding:14px; border:4px solid #dc143c;
 }
-
-.stDownloadButton>button span { 
-    color:#ffffff !important; 
-    font-weight:900 !important; 
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
+.stTabs [data-baseweb="tab"] {
+    background:linear-gradient(135deg,rgba(220,20,60,0.3),rgba(139,0,0,0.3)); border-radius:14px;
+    color:#ffffff !important; font-weight:900 !important; font-size:1.05rem !important;
+    padding:16px 24px; border:2px solid transparent;
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   DATAFRAME TOOLBAR BUTTONS — FULLSCREEN (RED) & DOWNLOAD (BLUE)
-   Targets the icon-buttons that appear in the top-right corner
-   of every st.dataframe / st.table widget.
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Toolbar wrapper - make it always visible */
-[data-testid="stDataFrame"] [data-testid="stElementToolbar"],
-[data-testid="stDataFrame"] [data-testid="StyledFullScreenButton"],
-[data-testid="stDataFrame"] > div:first-child > div:last-child,
-.stDataFrame [data-testid="stElementToolbar"] {
-    opacity: 1 !important;
-    visibility: visible !important;
-    background: rgba(10,10,30,0.95) !important;
-    border: 2px solid #dc143c !important;
-    border-radius: 10px !important;
-    padding: 4px !important;
+.stTabs [aria-selected="true"] {
+    background:linear-gradient(135deg,#dc143c,#ff0000); color:white !important;
+    border:3px solid #ffffff; box-shadow:0 10px 24px rgba(220,20,60,0.8);
 }
+.stRadio > div { background:rgba(26,26,60,0.7); border-radius:14px; padding:22px; border:4px solid #dc143c; }
+.stRadio label { color:#ffffff !important; font-weight:900 !important; font-size:1.15rem !important; }
+.stSuccess { background:rgba(0,100,0,0.95) !important; border-left:6px solid #00ff00 !important; }
+.stInfo    { background:rgba(0,50,150,0.95) !important; border-left:6px solid #0099ff !important; }
+.stWarning { background:rgba(200,100,0,0.95) !important; border-left:6px solid #ffcc00 !important; }
+.stError   { background:rgba(150,0,0,0.95) !important; border-left:6px solid #ff0000 !important; }
+.stNumberInput input { background-color:#000000 !important; color:#ffffff !important; border:4px solid #dc143c !important; font-weight:900 !important; font-size:1.15rem !important; }
+hr { border:4px solid #dc143c; margin:32px 0; box-shadow:0 4px 18px rgba(220,20,60,0.8); }
+.kpi-card { background:linear-gradient(135deg,rgba(220,20,60,0.25),rgba(10,10,30,0.9)); border:3px solid #dc143c; border-radius:16px; padding:22px 16px; text-align:center; box-shadow:0 10px 28px rgba(220,20,60,0.5); transition:transform 0.2s ease; }
+.kpi-card:hover { transform:translateY(-5px); }
+.kpi-title { font-size:0.8rem; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.8) !important; margin-bottom:8px; font-weight:800; }
+.kpi-value { font-size:1.9rem; font-weight:900; color:#ff4444 !important; line-height:1.15; }
+.kpi-sub { font-size:0.8rem; color:rgba(255,255,255,0.7) !important; margin-top:6px; }
+.rank-card-red { background:linear-gradient(135deg,rgba(220,20,60,0.25),rgba(10,10,30,0.95)); border-left:6px solid #dc143c; border-radius:12px; padding:14px 18px; margin-bottom:10px; }
+.rank-card-green { background:linear-gradient(135deg,rgba(0,150,50,0.25),rgba(10,10,30,0.95)); border-left:6px solid #00cc44; border-radius:12px; padding:14px 18px; margin-bottom:10px; }
 
-/* ALL toolbar icon buttons inside dataframe */
-[data-testid="stDataFrame"] button,
-[data-testid="stDataFrame"] [data-testid="stElementToolbar"] button,
-[data-testid="stElementToolbar"] button {
-    background: #dc143c !important;
-    color: #ffffff !important;
-    border: 3px solid #ffffff !important;
-    border-radius: 8px !important;
-    font-weight: 900 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    padding: 8px 10px !important;
-    margin: 2px !important;
-    box-shadow: 0 4px 14px rgba(220,20,60,0.8) !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
+/* ── CUSTOM DARK HTML TABLE ── */
+.dark-table-wrap {
+    overflow-x:auto; overflow-y:auto;
+    border:3px solid #dc143c; border-radius:12px;
+    box-shadow:0 10px 30px rgba(220,20,60,0.4);
+    background:#05050f; margin-bottom:8px;
 }
-
-[data-testid="stDataFrame"] button:hover,
-[data-testid="stElementToolbar"] button:hover {
-    background: #ff0000 !important;
-    transform: scale(1.1) !important;
-    box-shadow: 0 6px 20px rgba(220,20,60,1) !important;
+.dark-table-wrap table {
+    border-collapse:collapse; width:100%; font-family:'Arial Black',Arial,sans-serif;
+    background:#05050f;
 }
-
-/* SVG icons inside toolbar buttons — white */
-[data-testid="stDataFrame"] button svg,
-[data-testid="stElementToolbar"] button svg {
-    fill: #ffffff !important;
-    stroke: #ffffff !important;
-    color: #ffffff !important;
-    width: 18px !important;
-    height: 18px !important;
+.dark-table-wrap thead tr { background:#12002a; }
+.dark-table-wrap thead th {
+    background:#12002a !important; color:#ffffff !important; font-weight:900;
+    font-size:0.85rem; padding:13px 14px; border-bottom:3px solid #dc143c;
+    border-right:1px solid rgba(220,20,60,0.3); text-align:center;
+    white-space:nowrap; position:sticky; top:0; z-index:2;
+    text-shadow:1px 1px 4px rgba(0,0,0,1);
 }
-
-/* ── Second button (Download) override to BLUE ── */
-[data-testid="stDataFrame"] button:nth-of-type(2),
-[data-testid="stElementToolbar"] button:nth-of-type(2) {
-    background: #0066cc !important;
-    border: 3px solid #ffffff !important;
-    box-shadow: 0 4px 14px rgba(0,102,204,0.8) !important;
+.dark-table-wrap thead th:first-child { border-right:3px solid #dc143c; text-align:left; }
+.dark-table-wrap tbody tr:nth-child(odd)  { background:#07071a; }
+.dark-table-wrap tbody tr:nth-child(even) { background:#0d0d22; }
+.dark-table-wrap tbody tr:hover td { background:rgba(220,20,60,0.22) !important; }
+.dark-table-wrap tbody td {
+    color:#ffffff !important; font-weight:700; font-size:0.9rem;
+    padding:11px 14px; border-bottom:1px solid rgba(220,20,60,0.15);
+    border-right:1px solid rgba(220,20,60,0.1); text-align:right;
+    text-shadow:1px 1px 3px rgba(0,0,0,0.9);
 }
-
-[data-testid="stDataFrame"] button:nth-of-type(2):hover,
-[data-testid="stElementToolbar"] button:nth-of-type(2):hover {
-    background: #0080ff !important;
-    box-shadow: 0 6px 20px rgba(0,102,204,1) !important;
+.dark-table-wrap tbody td.idx-cell {
+    background:#0a0020 !important; color:#aaaaaa !important;
+    font-size:0.8rem; text-align:center; border-right:2px solid rgba(220,20,60,0.4);
+    min-width:38px; font-weight:600;
 }
-
-/* Legacy selectors for older Streamlit versions */
-button[title="View fullscreen"],
-button[aria-label="View fullscreen"],
-button[title*="fullscreen"],
-button[aria-label*="fullscreen"] {
-    background: #dc143c !important; 
-    color: #ffffff !important;
-    border: 4px solid #ffffff !important; 
-    border-radius: 10px !important;
-    font-weight: 900 !important; 
-    opacity: 1 !important; 
-    visibility: visible !important;
-    padding: 10px 14px !important; 
-    font-size: 1.1rem !important;
-    box-shadow: 0 8px 20px rgba(220,20,60,1) !important;
-    z-index: 9999 !important;
-    min-width: 38px !important;
-    min-height: 38px !important;
-}
-
-button[title="View fullscreen"] svg,
-button[aria-label="View fullscreen"] svg {
-    fill: #ffffff !important;
-    stroke: #ffffff !important;
-}
-
-button[title="Download"],
-button[aria-label="Download"],
-button[title*="download"],
-button[aria-label*="download"] {
-    background: #0066cc !important; 
-    color: #ffffff !important;
-    border: 4px solid #ffffff !important; 
-    border-radius: 10px !important;
-    font-weight: 900 !important; 
-    opacity: 1 !important; 
-    visibility: visible !important;
-    padding: 10px 14px !important; 
-    font-size: 1.1rem !important;
-    box-shadow: 0 8px 20px rgba(0,102,204,1) !important;
-    z-index: 9999 !important;
-    min-width: 38px !important;
-    min-height: 38px !important;
-}
-
-button[title="Download"] svg,
-button[aria-label="Download"] svg {
-    fill: #ffffff !important;
-    stroke: #ffffff !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   DATAFRAME / TABLE — COMPLETE DARK BACKGROUND FIX
-   Forces the white default background to near-black everywhere
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Outermost dataframe container */
-[data-testid="stDataFrame"],
-[data-testid="stDataFrame"] > div,
-[data-testid="stDataFrame"] > div > div,
-[data-testid="stDataFrame"] iframe {
-    background: rgba(5,5,15,0.98) !important;
-    border-radius: 14px !important;
-    border: 4px solid #dc143c !important;
-    box-shadow: 0 16px 44px rgba(0,0,0,0.9) !important;
-}
-
-/* The inner Glide/AG-grid canvas element */
-[data-testid="stDataFrame"] canvas {
-    background: rgba(5,5,15,0.98) !important;
-}
-
-/* Scrollable viewport wrappers */
-[data-testid="stDataFrame"] [class*="dvn-scroller"],
-[data-testid="stDataFrame"] [class*="scroll"],
-[data-testid="stDataFrame"] [class*="container"],
-[data-testid="stDataFrame"] [class*="wrapper"],
-[data-testid="stDataFrame"] [class*="viewport"] {
-    background: rgba(5,5,15,0.98) !important;
-}
-
-/* Table header row */
-[data-testid="stDataFrame"] th,
-[data-testid="stDataFrame"] [role="columnheader"],
-[data-testid="stDataFrame"] thead th,
-[data-testid="stDataFrame"] thead tr {
-    background: rgba(20,0,50,0.98) !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    font-weight: 900 !important;
-    font-size: 1.05rem !important;
-    text-shadow: 2px 2px 8px rgba(0,0,0,1) !important;
-    padding: 14px 12px !important;
-    border-bottom: 4px solid #dc143c !important;
-    border-right: 1px solid rgba(220,20,60,0.3) !important;
-}
-
-/* Index / first-column header */
-[data-testid="stDataFrame"] th:first-child,
-[data-testid="stDataFrame"] [role="columnheader"]:first-child {
-    background: rgba(30,0,60,0.98) !important;
-    border-right: 4px solid #dc143c !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-}
-
-/* Data cells */
-[data-testid="stDataFrame"] td,
-[data-testid="stDataFrame"] [role="gridcell"] {
-    background: rgba(8,8,25,0.97) !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 1rem !important;
-    text-shadow: 1px 1px 5px rgba(0,0,0,0.95) !important;
-    border-bottom: 1px solid rgba(220,20,60,0.2) !important;
-    border-right: 1px solid rgba(220,20,60,0.15) !important;
-    padding: 12px !important;
-}
-
-/* Index / first-column cells */
-[data-testid="stDataFrame"] td:first-child,
-[data-testid="stDataFrame"] [role="gridcell"]:first-child {
-    background: rgba(20,0,45,0.98) !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    font-weight: 900 !important;
-    border-right: 4px solid #dc143c !important;
-}
-
-/* Alternating row tint */
-[data-testid="stDataFrame"] tr:nth-child(even) td,
-[data-testid="stDataFrame"] [role="row"]:nth-child(even) [role="gridcell"] {
-    background: rgba(15,5,35,0.97) !important;
-}
-
-/* Row hover */
-[data-testid="stDataFrame"] tr:hover td,
-[data-testid="stDataFrame"] [role="row"]:hover [role="gridcell"] {
-    background: rgba(220,20,60,0.18) !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-}
-
-/* Force ALL text inside dataframe to white */
-[data-testid="stDataFrame"] *,
-[data-testid="stDataFrame"] span,
-[data-testid="stDataFrame"] div:not([data-testid="stElementToolbar"]) {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-}
-
-/* Scrollbar styling */
-[data-testid="stDataFrame"] ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-    background: rgba(10,10,30,0.9);
-}
-[data-testid="stDataFrame"] ::-webkit-scrollbar-thumb {
-    background: #dc143c;
-    border-radius: 4px;
-}
-[data-testid="stDataFrame"] ::-webkit-scrollbar-corner {
-    background: rgba(10,10,30,0.9);
-}
-
-/* Tabs */
-.stTabs [data-baseweb="tab-list"] { 
-    gap:12px; 
-    background:rgba(10,10,30,0.9); 
-    border-radius:16px; 
-    padding:14px; 
-    border:4px solid #dc143c; 
-}
-
-.stTabs [data-baseweb="tab"] { 
-    background:linear-gradient(135deg,rgba(220,20,60,0.3),rgba(139,0,0,0.3)); 
-    border-radius:14px; 
-    color:#ffffff !important; 
-    font-weight:900 !important; 
-    font-size:1.05rem !important; 
-    padding:16px 24px; 
-    border:2px solid transparent; 
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
-}
-
-.stTabs [aria-selected="true"] { 
-    background:linear-gradient(135deg,#dc143c,#ff0000); 
-    color:white !important; 
-    border:3px solid #ffffff; 
-    box-shadow:0 10px 24px rgba(220,20,60,0.8); 
-}
-
-/* Radio Buttons */
-.stRadio > div { 
-    background:rgba(26,26,60,0.7); 
-    border-radius:14px; 
-    padding:22px; 
-    border:4px solid #dc143c; 
-}
-
-.stRadio label { 
-    color:#ffffff !important; 
-    font-weight:900 !important; 
-    font-size:1.15rem !important; 
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
-}
-
-/* Alert Boxes */
-.stSuccess { 
-    background:rgba(0,100,0,0.95) !important; 
-    border-left:6px solid #00ff00 !important; 
-    color:#ffffff !important; 
-}
-
-.stInfo { 
-    background:rgba(0,50,150,0.95) !important; 
-    border-left:6px solid #0099ff !important; 
-    color:#ffffff !important; 
-}
-
-.stWarning { 
-    background:rgba(200,100,0,0.95) !important; 
-    border-left:6px solid #ffcc00 !important; 
-    color:#ffffff !important; 
-}
-
-.stError { 
-    background:rgba(150,0,0,0.95) !important; 
-    border-left:6px solid #ff0000 !important; 
-    color:#ffffff !important; 
-}
-
-/* Number Input - BLACK BACKGROUND + WHITE TEXT */
-.stNumberInput input { 
-    background-color:#000000 !important; 
-    color:#ffffff !important; 
-    border:4px solid #dc143c !important; 
-    font-weight:900 !important; 
-    font-size:1.15rem !important; 
-    text-shadow:2px 2px 6px rgba(0,0,0,1);
-}
-
-/* Divider */
-hr { 
-    border:4px solid #dc143c; 
-    margin:32px 0; 
-    box-shadow:0 4px 18px rgba(220,20,60,0.8); 
-}
-
-/* KPI Cards */
-.kpi-card { 
-    background:linear-gradient(135deg,rgba(220,20,60,0.25),rgba(10,10,30,0.9)); 
-    border:3px solid #dc143c; 
-    border-radius:16px; 
-    padding:22px 16px; 
-    text-align:center; 
-    box-shadow:0 10px 28px rgba(220,20,60,0.5); 
-    transition:transform 0.2s ease; 
-}
-
-.kpi-card:hover { 
-    transform:translateY(-5px); 
-    box-shadow:0 16px 42px rgba(220,20,60,0.7); 
-}
-
-.kpi-title { 
-    font-size:0.8rem; 
-    letter-spacing:2px; 
-    text-transform:uppercase; 
-    color:rgba(255,255,255,0.8) !important; 
-    margin-bottom:8px; 
-    font-weight:800; 
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
-}
-
-.kpi-value { 
-    font-size:1.9rem; 
-    font-weight:900; 
-    color:#ff4444 !important; 
-    text-shadow:3px 3px 8px rgba(0,0,0,0.8); 
-    line-height:1.15; 
-}
-
-.kpi-sub { 
-    font-size:0.8rem; 
-    color:rgba(255,255,255,0.7) !important; 
-    margin-top:6px; 
-    text-shadow:3px 3px 8px rgba(0,0,0,1);
-}
-
-/* Rank Cards */
-.rank-card-red { 
-    background:linear-gradient(135deg,rgba(220,20,60,0.25),rgba(10,10,30,0.95)); 
-    border-left:6px solid #dc143c; 
-    border-radius:12px; 
-    padding:14px 18px; 
-    margin-bottom:10px; 
-}
-
-.rank-card-green { 
-    background:linear-gradient(135deg,rgba(0,150,50,0.25),rgba(10,10,30,0.95)); 
-    border-left:6px solid #00cc44; 
-    border-radius:12px; 
-    padding:14px 18px; 
-    margin-bottom:10px; 
+.dark-table-wrap tbody td.name-cell {
+    background:#0f0028 !important; color:#ffffff !important; font-weight:900;
+    border-right:3px solid #dc143c; text-align:left; white-space:nowrap;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -589,6 +166,125 @@ COLORS = ['#ff0000','#ff6600','#ffcc00','#00ccff','#cc00ff',
           '#00ff88','#ff66cc','#4488ff','#ff4488','#88ff44']
 
 # ─────────────────────────────────────────────
+# HTML TABLE HELPERS
+# ─────────────────────────────────────────────
+def _heat_color(val, vmin, vmax):
+    """Map value → red heatmap rgba string."""
+    t = max(0.0, min(1.0, (float(val) - vmin) / (vmax - vmin + 1e-9)))
+    if t < 0.35:
+        s = t / 0.35
+        r = int(10  + s * 80);  g = int(10 + s * 5);  b = int(40 + s * 0)
+    elif t < 0.65:
+        s = (t - 0.35) / 0.30
+        r = int(90  + s * (139-90)); g = 0; b = 0
+    else:
+        s = (t - 0.65) / 0.35
+        r = int(139 + s * (255-139)); g = 0; b = 0
+    return f"rgba({r},{g},{b},0.88)"
+
+
+def render_dark_table(df, heat_cols=None, height=420, show_index=True):
+    """Fully custom dark HTML table — no Streamlit iframe, total control."""
+    heat_cols = heat_cols or []
+    col_ranges = {}
+    for c in heat_cols:
+        if c in df.columns:
+            nums = pd.to_numeric(df[c], errors='coerce').dropna()
+            if len(nums):
+                col_ranges[c] = (float(nums.min()), float(nums.max()))
+
+    # header
+    hdr = ""
+    if show_index:
+        hdr += "<th style='min-width:38px;text-align:center'>#</th>"
+    for col in df.columns:
+        hdr += f"<th>{col}</th>"
+
+    # rows
+    body = ""
+    for row_idx, (df_idx, row) in enumerate(df.iterrows()):
+        tds = ""
+        if show_index:
+            tds += f"<td class='idx-cell'>{df_idx}</td>"
+        for j, col in enumerate(df.columns):
+            raw = row[col]
+            # choose background
+            if col in col_ranges:
+                try:
+                    bg = _heat_color(float(raw), *col_ranges[col])
+                except Exception:
+                    bg = "#07071a"
+                try:
+                    display = f"{int(float(raw)):,}"
+                except Exception:
+                    display = str(raw)
+                tds += f"<td style='background:{bg};color:#fff;font-weight:900;'>{display}</td>"
+            elif j == 0:
+                tds += f"<td class='name-cell'>{raw}</td>"
+            else:
+                tds += f"<td style='text-align:right;'>{raw}</td>"
+        body += f"<tr>{tds}</tr>"
+
+    html = f"""<div class="dark-table-wrap" style="max-height:{height}px;">
+<table><thead><tr>{hdr}</tr></thead><tbody>{body}</tbody></table></div>"""
+    st.markdown(html, unsafe_allow_html=True)
+
+
+def render_simple_table(df, height=300, show_index=False):
+    """Plain dark table, no heatmap."""
+    hdr = ""
+    if show_index:
+        hdr += "<th style='text-align:center'>#</th>"
+    for col in df.columns:
+        hdr += f"<th>{col}</th>"
+    body = ""
+    for df_idx, row in df.iterrows():
+        tds = ""
+        if show_index:
+            tds += f"<td class='idx-cell'>{df_idx}</td>"
+        for j, col in enumerate(df.columns):
+            cls = "name-cell" if j == 0 else ""
+            align = "left" if j == 0 else "right"
+            tds += f"<td class='{cls}' style='text-align:{align};'>{row[col]}</td>"
+        body += f"<tr>{tds}</tr>"
+    html = f"""<div class="dark-table-wrap" style="max-height:{height}px;">
+<table><thead><tr>{hdr}</tr></thead><tbody>{body}</tbody></table></div>"""
+    st.markdown(html, unsafe_allow_html=True)
+
+
+def render_pivot_table(df, height=320):
+    """Pivot table with all-numeric heatmap."""
+    all_vals = []
+    for col in df.columns:
+        try:
+            all_vals.extend(pd.to_numeric(df[col], errors='coerce').dropna().tolist())
+        except Exception:
+            pass
+    vmin = min(all_vals) if all_vals else 0
+    vmax = max(all_vals) if all_vals else 1
+
+    hdr = f"<th style='text-align:left'>{df.index.name or 'State'}</th>"
+    for col in df.columns:
+        hdr += f"<th>{col}</th>"
+
+    body = ""
+    for idx, row in df.iterrows():
+        tds = f"<td class='name-cell'>{idx}</td>"
+        for col in df.columns:
+            try:
+                bg = _heat_color(float(row[col]), vmin, vmax)
+                display = f"{int(float(row[col])):,}"
+            except Exception:
+                bg = "#07071a"; display = str(row[col])
+            tds += f"<td style='background:{bg};color:#fff;font-weight:900;'>{display}</td>"
+        body += f"<tr>{tds}</tr>"
+
+    html = f"""<div class="dark-table-wrap" style="max-height:{height}px;">
+<table><thead><tr>{hdr}</tr></thead><tbody>{body}</tbody></table></div>"""
+    st.markdown(html, unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────
 # DATA + MODEL LOADING
 # ─────────────────────────────────────────────
 @st.cache_data
@@ -612,49 +308,34 @@ def load_models():
 
 @st.cache_resource
 def load_crime_models():
-    """Load pre-trained Random Forest models from state_crime_forecasting_models/ folder.
-    Falls back to fast polynomial models if folder not found."""
     import os, glob
     models = {}
     model_dir = "state_crime_forecasting_models"
-
     if os.path.isdir(model_dir):
-        pkl_files = glob.glob(f"{model_dir}/*.pkl")
-        for fpath in pkl_files:
-            fname = os.path.basename(fpath).replace(".pkl", "")
+        for fpath in glob.glob(f"{model_dir}/*.pkl"):
+            fname = os.path.basename(fpath).replace(".pkl","")
             parts = fname.split("__")
-            if len(parts) != 2:
-                continue
-            raw_state, raw_crime = parts
-            state = raw_state.replace("_AND_", " & ").replace("_", " ")
-            crime = raw_crime.replace("_AND_", " & ").replace("_", " ")
-            models[(state, crime)] = joblib.load(fpath)
-        if models:
-            return models, len(models)
-
-    # Fallback: fast polynomial trend models (instant, no training delay)
+            if len(parts) != 2: continue
+            state = parts[0].replace("_AND_"," & ").replace("_"," ")
+            crime = parts[1].replace("_AND_"," & ").replace("_"," ")
+            models[(state,crime)] = joblib.load(fpath)
+        if models: return models, len(models)
     from sklearn.linear_model import LinearRegression
     from sklearn.preprocessing import PolynomialFeatures
     from sklearn.pipeline import Pipeline
     fallback = {}
     for state in _df_state["STATE/UT"].unique():
-        sdf = _df_state[_df_state["STATE/UT"] == state].sort_values("YEAR")
-        for crime in PLOT_CRIMES + ["TOTAL IPC CRIMES"]:
-            if len(sdf) < 3:
-                continue
-            X = sdf[["YEAR"]].values
-            y = sdf[crime].values
-            pipe = Pipeline([
-                ("poly", PolynomialFeatures(degree=2, include_bias=False)),
-                ("reg",  LinearRegression())
-            ])
-            pipe.fit(X, y)
-            fallback[(state, crime)] = pipe
+        sdf = _df_state[_df_state["STATE/UT"]==state].sort_values("YEAR")
+        for crime in PLOT_CRIMES+["TOTAL IPC CRIMES"]:
+            if len(sdf)<3: continue
+            pipe = Pipeline([("poly",PolynomialFeatures(degree=2,include_bias=False)),("reg",LinearRegression())])
+            pipe.fit(sdf[["YEAR"]].values, sdf[crime].values)
+            fallback[(state,crime)] = pipe
     return fallback, 0
 
 df_state, df_trend, df_pred = load_data()
 crime_model, label_enc, risk_model = load_models()
-_df_state = df_state  # needed by fallback inside load_crime_models
+_df_state = df_state
 crime_models, _n_loaded = load_crime_models()
 
 STATE_LIST = sorted(df_state["STATE/UT"].unique().tolist())
@@ -666,12 +347,9 @@ YEARS      = sorted(df_state["YEAR"].unique().tolist())
 with st.sidebar:
     st.markdown("<h2 style='text-align:center;'>🎯 COMMAND CENTER</h2>", unsafe_allow_html=True)
     st.markdown("---")
-    menu = st.radio("📊 Select Module", [
-        "🏠 National Overview",
-        "🗺️ India Crime Map",
-        "📊 State-wise Analysis",
-        "🔍 National Trend Analysis",
-        "🤖 AI Prediction Engine",
+    menu = st.radio("📊 Select Module",[
+        "🏠 National Overview","🗺️ India Crime Map",
+        "📊 State-wise Analysis","🔍 National Trend Analysis","🤖 AI Prediction Engine",
     ], index=0)
     st.markdown("---")
     st.markdown("### 📈 System Status")
@@ -688,30 +366,18 @@ st.markdown("<h1>🚨 CRIME INTELLIGENCE PRO 🚨</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;font-size:1.3rem;color:#ff6666;font-weight:800;'>AI-Powered National Crime Analytics & Prediction System | India (2001–2012)</p>", unsafe_allow_html=True)
 st.markdown("---")
 
-# ─────────────────────────────────────────────
-# HELPER: plotly dark layout
-# ─────────────────────────────────────────────
 def dark_layout(title="", h=460, dtick_x=1):
     return dict(
         title=dict(text=title, font=dict(size=18,color='#ffffff',family='Arial Black')),
-        plot_bgcolor='rgba(10,10,30,0.85)',
-        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(10,10,30,0.85)', paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='#ffffff',size=13,family='Arial Black'),
-        xaxis=dict(color='#ffffff',gridcolor='rgba(220,20,60,0.25)',
-                   showgrid=True, zeroline=False, dtick=dtick_x,
+        xaxis=dict(color='#ffffff',gridcolor='rgba(220,20,60,0.25)',showgrid=True,zeroline=False,
+                   dtick=dtick_x,tickfont=dict(color='#ffffff',size=12)),
+        yaxis=dict(color='#ffffff',gridcolor='rgba(220,20,60,0.25)',showgrid=True,zeroline=False,
                    tickfont=dict(color='#ffffff',size=12)),
-        yaxis=dict(color='#ffffff',gridcolor='rgba(220,20,60,0.25)',
-                   showgrid=True, zeroline=False,
-                   tickfont=dict(color='#ffffff',size=12)),
-        legend=dict(bgcolor='rgba(10,10,35,0.92)',
-                    font=dict(color='#ffffff',size=12),
-                    bordercolor='#dc143c',borderwidth=2),
+        legend=dict(bgcolor='rgba(10,10,35,0.92)',font=dict(color='#ffffff',size=12),bordercolor='#dc143c',borderwidth=2),
         height=h, hovermode='x unified',
-        hoverlabel=dict(
-            bgcolor='rgba(10,10,35,0.97)',
-            bordercolor='#dc143c',
-            font=dict(color='#ffffff', size=14, family='Arial Black')
-        )
+        hoverlabel=dict(bgcolor='rgba(10,10,35,0.97)',bordercolor='#dc143c',font=dict(color='#ffffff',size=14,family='Arial Black'))
     )
 
 
@@ -731,12 +397,12 @@ if "National Overview" in menu:
     all_total = int(df_state["TOTAL IPC CRIMES"].sum())
 
     kpi_data = [
-        ("🇮🇳 Total Crimes 2012", f"{total_l:,}",    f"YoY {yoy_pct:+.1f}%"),
-        ("📊 All Years Total",     f"{all_total:,}",  "2001–2012"),
-        ("⚠️ Highest Crime State", worst.title(),     f"{int(latest['TOTAL IPC CRIMES'].max()):,}"),
-        ("✅ Safest State/UT",     safest.title(),    f"{int(latest['TOTAL IPC CRIMES'].min()):,}"),
-        ("🔺 Top Crime Type",      top_cat.title(),   f"{int(latest[top_cat].sum()):,}"),
-        ("📈 YoY Growth",          f"{yoy_pct:.1f}%", "2011→2012"),
+        ("🇮🇳 Total Crimes 2012", f"{total_l:,}",   f"YoY {yoy_pct:+.1f}%"),
+        ("📊 All Years Total",     f"{all_total:,}", "2001–2012"),
+        ("⚠️ Highest Crime State", worst.title(),    f"{int(latest['TOTAL IPC CRIMES'].max()):,}"),
+        ("✅ Safest State/UT",     safest.title(),   f"{int(latest['TOTAL IPC CRIMES'].min()):,}"),
+        ("🔺 Top Crime Type",      top_cat.title(),  f"{int(latest[top_cat].sum()):,}"),
+        ("📈 YoY Growth",          f"{yoy_pct:.1f}%","2011→2012"),
     ]
     cols = st.columns(6)
     for col,(title,val,sub) in zip(cols,kpi_data):
@@ -778,13 +444,10 @@ if "National Overview" in menu:
             textfont=dict(color='#ffffff',size=11,family='Arial Black'),
             hovertemplate='<b>%{label}</b><br>Cases: %{value:,}<br>%{percent}<extra></extra>'
         ))
-        fig_pie.update_layout(paper_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='#ffffff',family='Arial Black'),
-            legend=dict(bgcolor='rgba(10,10,35,0.92)',font=dict(color='#ffffff',size=10),
-                        bordercolor='#dc143c',borderwidth=2),
+        fig_pie.update_layout(paper_bgcolor='rgba(0,0,0,0)',font=dict(color='#ffffff',family='Arial Black'),
+            legend=dict(bgcolor='rgba(10,10,35,0.92)',font=dict(color='#ffffff',size=10),bordercolor='#dc143c',borderwidth=2),
             height=420,
-            hoverlabel=dict(bgcolor='rgba(10,10,35,0.97)',bordercolor='#dc143c',
-                            font=dict(color='#ffffff',size=14,family='Arial Black')))
+            hoverlabel=dict(bgcolor='rgba(10,10,35,0.97)',bordercolor='#dc143c',font=dict(color='#ffffff',size=14,family='Arial Black')))
         st.plotly_chart(fig_pie, use_container_width=True)
 
     st.markdown("---")
@@ -807,15 +470,12 @@ if "National Overview" in menu:
                        "KIDNAPPING & ABDUCTION","ROBBERY","THEFT",
                        "BURGLARY","RIOTS","DOWRY DEATHS"]].copy()
     rank_df = rank_df.sort_values("TOTAL IPC CRIMES",ascending=False).reset_index(drop=True)
-    rank_df.index = rank_df.index+1
+    rank_df.index = rank_df.index + 1
     rank_df["STATE/UT"] = rank_df["STATE/UT"].str.title()
-    subset_cols = ["TOTAL IPC CRIMES","MURDER","RAPE","KIDNAPPING & ABDUCTION",
-                   "ROBBERY","THEFT","BURGLARY","RIOTS","DOWRY DEATHS"]
-    styled_rank = rank_df.style.background_gradient(cmap='Reds',subset=subset_cols)\
-        .set_properties(**{'color':'white','font-weight':'bold',
-                           '-webkit-text-fill-color':'white',
-                           'background-color':'rgba(8,8,25,0.97)'})
-    st.dataframe(styled_rank, use_container_width=True, height=420)
+    render_dark_table(rank_df,
+        heat_cols=["TOTAL IPC CRIMES","MURDER","RAPE","KIDNAPPING & ABDUCTION",
+                   "ROBBERY","THEFT","BURGLARY","RIOTS","DOWRY DEATHS"],
+        height=420, show_index=True)
 
 
 # ═══════════════════════════════════════════════════════
@@ -842,8 +502,7 @@ elif "India Crime Map" in menu:
                 tickfont=dict(color="#ffffff"),thickness=16,len=0.7,
                 bgcolor="rgba(10,10,30,0.9)",bordercolor="#dc143c",borderwidth=2),
             cmin=0,cmax=max_val,line=dict(color='#ffffff',width=1),opacity=0.87),
-        text=mdf["State_Title"],
-        textfont=dict(color='#ffffff',size=8,family='Arial Black'),
+        text=mdf["State_Title"], textfont=dict(color='#ffffff',size=8,family='Arial Black'),
         textposition="top center",
         customdata=np.stack([mdf["State_Title"],mdf[map_crime],mdf["TOTAL IPC CRIMES"],mdf["MURDER"]],axis=-1),
         hovertemplate=(
@@ -862,8 +521,7 @@ elif "India Crime Map" in menu:
         paper_bgcolor='rgba(10,10,30,0.95)',height=640,margin=dict(l=0,r=0,t=40,b=10),
         title=dict(text=f"<b>India Crime Map — {map_crime.title()} ({map_year})</b>",
             font=dict(size=18,color='#ffffff',family='Arial Black'),x=0.5),
-        hoverlabel=dict(bgcolor='rgba(10,10,35,0.97)',bordercolor='#dc143c',
-                        font=dict(color='#ffffff',size=14,family='Arial Black'))
+        hoverlabel=dict(bgcolor='rgba(10,10,35,0.97)',bordercolor='#dc143c',font=dict(color='#ffffff',size=14,family='Arial Black'))
     )
     st.plotly_chart(fig_map, use_container_width=True)
 
@@ -898,8 +556,7 @@ elif "India Crime Map" in menu:
         xaxis=dict(color='#ffffff',tickfont=dict(color='#ffffff',size=11)),
         yaxis=dict(color='#ffffff',autorange='reversed',tickfont=dict(color='#ffffff',size=11)),
         height=920,margin=dict(l=220,r=20,t=20,b=60),
-        hoverlabel=dict(bgcolor='rgba(10,10,35,0.97)',bordercolor='#dc143c',
-                        font=dict(color='#ffffff',size=14,family='Arial Black'))
+        hoverlabel=dict(bgcolor='rgba(10,10,35,0.97)',bordercolor='#dc143c',font=dict(color='#ffffff',size=14,family='Arial Black'))
     )
     st.plotly_chart(fig_heat, use_container_width=True)
 
@@ -913,7 +570,7 @@ elif "State-wise" in menu:
     with sc1: sel_state = st.selectbox("🏛️ Select State/UT",STATE_LIST,key="st_sel")
     with sc2: sel_crime = st.selectbox("🔍 Crime Type",["TOTAL IPC CRIMES"]+PLOT_CRIMES,key="st_cr")
 
-    sdf      = df_state[df_state["STATE/UT"]==sel_state].sort_values("YEAR")
+    sdf = df_state[df_state["STATE/UT"]==sel_state].sort_values("YEAR")
     latest_s = sdf[sdf["YEAR"]==YEARS[-1]].iloc[0]
     prev_s   = sdf[sdf["YEAR"]==YEARS[-2]].iloc[0]
     growth_s = ((latest_s[sel_crime]-prev_s[sel_crime])/prev_s[sel_crime])*100
@@ -999,9 +656,8 @@ elif "State-wise" in menu:
 
     with ts4:
         available_states = [s for s in STATE_LIST if s!=sel_state]
-        default_compare  = available_states[:3]
-        compare_states   = st.multiselect("🆚 Select States to Compare",available_states,
-                                          default=default_compare,max_selections=5,key="cmp_st")
+        compare_states = st.multiselect("🆚 Select States to Compare",available_states,
+                                        default=available_states[:3],max_selections=5,key="cmp_st")
         states_to_plot = [sel_state]+compare_states
         fig_cmp = go.Figure()
         cmp_colors = ['#ff0000','#00ccff','#ffcc00','#00ff88','#cc00ff','#ff6600']
@@ -1014,14 +670,12 @@ elif "State-wise" in menu:
         st.plotly_chart(fig_cmp, use_container_width=True)
 
     with ts5:
-        disp = ["YEAR"]+PLOT_CRIMES+["TOTAL IPC CRIMES"]
-        styled_s = sdf[disp].style.background_gradient(cmap='Reds',subset=PLOT_CRIMES+["TOTAL IPC CRIMES"])\
-            .set_properties(**{'color':'white','font-weight':'bold','-webkit-text-fill-color':'white',
-                               'background-color':'rgba(8,8,25,0.97)'})
-        st.dataframe(styled_s,use_container_width=True,height=400)
-        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+        disp = sdf[["YEAR"]+PLOT_CRIMES+["TOTAL IPC CRIMES"]].copy()
+        disp["YEAR"] = disp["YEAR"].astype(int)
+        render_dark_table(disp, heat_cols=PLOT_CRIMES+["TOTAL IPC CRIMES"], height=400, show_index=False)
+        st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
         st.download_button(f"📥 Download {sel_state.title()} Data",
-            data=sdf[disp].to_csv(index=False).encode('utf-8'),
+            data=disp.to_csv(index=False).encode('utf-8'),
             file_name=f"{sel_state.replace(' ','_')}_crime.csv",mime="text/csv")
 
 
@@ -1069,13 +723,13 @@ elif "National Trend" in menu:
         cs1,cs2 = st.columns(2)
         with cs1:
             st.markdown("<h4>📊 STATISTICS</h4>", unsafe_allow_html=True)
-            stats = pd.DataFrame({"Metric":["Mean","Median","Std Dev","Min","Max","Range","Growth Rate"],
+            stats = pd.DataFrame({
+                "Metric":["Mean","Median","Std Dev","Min","Max","Range","Growth Rate"],
                 "Value":[f"{series.mean():,.2f}",f"{series.median():,.2f}",f"{series.std():,.2f}",
                          f"{series.min():,}",f"{series.max():,}",
-                         f"{series.max()-series.min():,}",f"{growth_rate:+.2f}%"]})
-            styled_stats = stats.style.set_properties(**{'color':'white','font-weight':'bold',
-                '-webkit-text-fill-color':'white','background-color':'rgba(8,8,25,0.97)'})
-            st.dataframe(styled_stats,use_container_width=True,hide_index=True)
+                         f"{series.max()-series.min():,}",f"{growth_rate:+.2f}%"]
+            })
+            render_simple_table(stats, height=280, show_index=False)
         with cs2:
             st.markdown("<h4>📈 YEAR-ON-YEAR CHANGES</h4>", unsafe_allow_html=True)
             yoy = series.pct_change()*100
@@ -1087,22 +741,15 @@ elif "National Trend" in menu:
                 textposition='outside',textfont=dict(color='#ffffff',size=11),
                 hovertemplate='<b>%{x}</b><br>Change: %{y:+.2f}%<extra></extra>'))
             fig_yoy2.add_hline(y=0,line_color='white',line_dash='dash')
-            ly2 = dark_layout(h=340)
-            ly2["yaxis"]["title"] = "% Change"
+            ly2 = dark_layout(h=340); ly2["yaxis"]["title"] = "% Change"
             fig_yoy2.update_layout(**ly2)
             st.plotly_chart(fig_yoy2, use_container_width=True)
 
     with t4:
-        disp_nat = nat[["YEAR"]+PLOT_CRIMES+["TOTAL IPC CRIMES"]]
-        styled_n = disp_nat.style\
-            .background_gradient(cmap='Reds',subset=PLOT_CRIMES+["TOTAL IPC CRIMES"])\
-            .set_properties(**{'color':'white','font-weight':'bold',
-                               '-webkit-text-fill-color':'white',
-                               'text-shadow':'1px 1px 4px rgba(0,0,0,0.95)',
-                               'background-color':'rgba(8,8,25,0.97)'})\
-            .format({"YEAR": "{:.0f}"})
-        st.dataframe(styled_n,use_container_width=True,height=420)
-        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+        disp_nat = nat[["YEAR"]+PLOT_CRIMES+["TOTAL IPC CRIMES"]].copy()
+        disp_nat["YEAR"] = disp_nat["YEAR"].astype(int)
+        render_dark_table(disp_nat, heat_cols=PLOT_CRIMES+["TOTAL IPC CRIMES"], height=420, show_index=False)
+        st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
         st.download_button("📥 Download National Trend Data",
             data=disp_nat.to_csv(index=False).encode('utf-8'),
             file_name="national_crime_trend.csv",mime="text/csv")
@@ -1113,7 +760,6 @@ elif "National Trend" in menu:
 # ═══════════════════════════════════════════════════════
 elif "AI Prediction" in menu:
     st.markdown("<h2>🤖 AI-POWERED CRIME PREDICTION ENGINE</h2>", unsafe_allow_html=True)
-
     st.markdown("""
     <div style='background:linear-gradient(135deg,rgba(0,60,160,0.5),rgba(10,10,40,0.9));
                 border:2px solid #4488ff; border-radius:14px; padding:18px 24px; margin-bottom:16px;'>
@@ -1126,24 +772,20 @@ elif "AI Prediction" in menu:
 
     tab_p1,tab_p2,tab_p3 = st.tabs(["📍 State + Crime Forecast","📊 All States Overview","🔮 Future Timeline"])
 
-    # ── TAB 1: State + Crime Forecast (2026 onwards) ──────────────────
     with tab_p1:
         st.markdown("<h3>📍 Crime-wise Year-wise Prediction (2026 onwards)</h3>", unsafe_allow_html=True)
         pp1,pp2,pp3 = st.columns(3)
-        with pp1: pred_state  = st.selectbox("🏛️ State/UT",STATE_LIST,key="pred_st")
-        with pp2: pred_crime  = st.selectbox("🔍 Crime Type",["TOTAL IPC CRIMES"]+PLOT_CRIMES,key="pred_cr")
-        with pp3: pred_year   = st.number_input("📅 Forecast Year",min_value=2026,max_value=2035,value=2026,step=1,key="pred_yr")
+        with pp1: pred_state = st.selectbox("🏛️ State/UT",STATE_LIST,key="pred_st")
+        with pp2: pred_crime = st.selectbox("🔍 Crime Type",["TOTAL IPC CRIMES"]+PLOT_CRIMES,key="pred_cr")
+        with pp3: pred_year  = st.number_input("📅 Forecast Year",min_value=2026,max_value=2035,value=2026,step=1,key="pred_yr")
 
         model_key = (pred_state, pred_crime)
         if model_key in crime_models:
             m = crime_models[model_key]
             predicted = float(m.predict([[pred_year]])[0])
-            lower     = int(predicted*0.88)
-            upper     = int(predicted*1.12)
-
-            enc_val    = label_enc.transform([pred_state])[0]
-            X_risk     = pd.DataFrame({'State_Encoded':[enc_val]})
-            risk_score = float(risk_model.predict(X_risk)[0])
+            lower = int(predicted*0.88); upper = int(predicted*1.12)
+            enc_val = label_enc.transform([pred_state])[0]
+            risk_score = float(risk_model.predict(pd.DataFrame({'State_Encoded':[enc_val]}))[0])
             if risk_score>60:   rl,rc = "🔴 HIGH RISK",   "#ff4444"
             elif risk_score>25: rl,rc = "🟡 MEDIUM RISK", "#ffcc00"
             else:               rl,rc = "🟢 LOW RISK",    "#44ff88"
@@ -1161,12 +803,10 @@ elif "AI Prediction" in menu:
                     {int(predicted):,}</h1>
                 <p style='color:#ffff00;font-size:0.95rem;font-weight:800;background:rgba(0,0,0,0.35);
                           display:inline-block;padding:7px 20px;border-radius:20px;'>
-                    CONFIDENCE RANGE: {lower:,} – {upper:,}
-                </p><br><br>
+                    CONFIDENCE RANGE: {lower:,} – {upper:,}</p><br><br>
                 <p style='color:{rc};font-size:1rem;font-weight:900;background:rgba(0,0,0,0.4);
                           display:inline-block;padding:8px 22px;border-radius:20px;'>
-                    RISK SCORE: {risk_score:.1f}/100 &nbsp; {rl}
-                </p>
+                    RISK SCORE: {risk_score:.1f}/100 &nbsp; {rl}</p>
             </div>""", unsafe_allow_html=True)
 
             st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
@@ -1177,72 +817,59 @@ elif "AI Prediction" in menu:
             future_preds = [float(m.predict([[y]])[0]) for y in future_years]
 
             fig_fc = go.Figure()
-            fig_fc.add_trace(go.Scatter(
-                x=hist_sdf["YEAR"], y=hist_sdf[pred_crime], mode='lines+markers',
-                name='Historical (2001–2012)', line=dict(color='#00ccff',width=5),
+            fig_fc.add_trace(go.Scatter(x=hist_sdf["YEAR"],y=hist_sdf[pred_crime],mode='lines+markers',
+                name='Historical (2001–2012)',line=dict(color='#00ccff',width=5),
                 marker=dict(size=11,color='#0099ff'),
                 hovertemplate='<b>%{x}</b><br>Actual: %{y:,}<extra></extra>'))
             fig_fc.add_trace(go.Scatter(
-                x=[YEARS[-1],2026], y=[float(hist_sdf[pred_crime].iloc[-1]),future_preds[0]],
-                mode='lines', showlegend=False, line=dict(color='rgba(255,100,0,0.4)',width=2,dash='dot')))
+                x=[YEARS[-1],2026],y=[float(hist_sdf[pred_crime].iloc[-1]),future_preds[0]],
+                mode='lines',showlegend=False,line=dict(color='rgba(255,100,0,0.4)',width=2,dash='dot')))
             fig_fc.add_trace(go.Scatter(
                 x=future_years+future_years[::-1],
                 y=[int(p*1.12) for p in future_preds]+[int(p*0.88) for p in future_preds[::-1]],
                 fill='toself',fillcolor='rgba(255,200,0,0.15)',
                 line=dict(color='rgba(255,200,0,0)'),name='Confidence Band ±12%'))
-            fig_fc.add_trace(go.Scatter(
-                x=future_years, y=future_preds, mode='lines+markers',
-                name=f'Forecast 2026–2035', line=dict(color='#ff4400',width=4,dash='dash'),
+            fig_fc.add_trace(go.Scatter(x=future_years,y=future_preds,mode='lines+markers',
+                name='Forecast 2026–2035',line=dict(color='#ff4400',width=4,dash='dash'),
                 marker=dict(size=10,color='#ffcc00',symbol='diamond',line=dict(color='#ff0000',width=2)),
                 hovertemplate='<b>%{x}</b><br>Forecast: %{y:,}<extra></extra>'))
-            fig_fc.add_trace(go.Scatter(
-                x=[pred_year], y=[predicted], mode='markers', name=f'{pred_year} Target',
+            fig_fc.add_trace(go.Scatter(x=[pred_year],y=[predicted],mode='markers',name=f'{pred_year} Target',
                 marker=dict(size=30,color='#ffff00',symbol='star',line=dict(color='#ff0000',width=3)),
                 hovertemplate=f'<b>{pred_year}</b><br>Predicted: {int(predicted):,}<extra></extra>'))
 
             ly_fc = dark_layout(f"<b>{pred_state.title()} — {pred_crime.title()} Forecast (2001–2035)</b>",h=520)
             del ly_fc["xaxis"]["dtick"]
             fig_fc.update_layout(**ly_fc)
-            fig_fc.add_vline(x=2012.5, line_color='rgba(255,255,255,0.4)', line_dash='dash', line_width=1,
+            fig_fc.add_vline(x=2012.5,line_color='rgba(255,255,255,0.4)',line_dash='dash',line_width=1,
                              annotation_text="↑ Historical | Forecast ↑",
                              annotation_font_color="rgba(255,255,255,0.7)")
             st.plotly_chart(fig_fc, use_container_width=True)
 
             st.markdown("---")
             st.markdown(f"<h3>📊 All Crime Types — {pred_state.title()} Forecast for {pred_year}</h3>", unsafe_allow_html=True)
-            multi_crimes = PLOT_CRIMES + ["TOTAL IPC CRIMES"]
-            multi_preds  = []
-            for cr in multi_crimes:
-                mk = (pred_state, cr)
-                if mk in crime_models:
-                    multi_preds.append(float(crime_models[mk].predict([[pred_year]])[0]))
-                else:
-                    multi_preds.append(0)
-
+            multi_crimes = PLOT_CRIMES+["TOTAL IPC CRIMES"]
+            multi_preds  = [float(crime_models[(pred_state,cr)].predict([[pred_year]])[0])
+                            if (pred_state,cr) in crime_models else 0 for cr in multi_crimes]
             fig_mc = go.Figure(go.Bar(
-                x=[c.title() for c in multi_crimes], y=multi_preds,
+                x=[c.title() for c in multi_crimes],y=multi_preds,
                 marker=dict(color=COLORS+['#ffffff'],line=dict(color='#ffffff',width=1)),
                 text=[f"<b>{int(v):,}</b>" for v in multi_preds],
                 textposition='outside',textfont=dict(color='#ffffff',size=10,family='Arial Black'),
                 hovertemplate='<b>%{x}</b><br>Forecast: %{y:,.0f}<extra></extra>'))
             lay_mc = dark_layout(f"<b>{pred_state.title()} — All Crimes Forecast ({pred_year})</b>",h=440)
-            lay_mc["xaxis"]["tickangle"] = -35
-            del lay_mc["xaxis"]["dtick"]
+            lay_mc["xaxis"]["tickangle"] = -35; del lay_mc["xaxis"]["dtick"]
             fig_mc.update_layout(**lay_mc)
             st.plotly_chart(fig_mc, use_container_width=True)
 
             dl_df = pd.DataFrame({"Year":future_years,"Predicted":future_preds,
-                "Lower":[int(p*0.88) for p in future_preds],
-                "Upper":[int(p*1.12) for p in future_preds]})
+                "Lower":[int(p*0.88) for p in future_preds],"Upper":[int(p*1.12) for p in future_preds]})
             st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
             st.download_button("📥 Download Full Forecast (2026–2035)",
                 data=dl_df.to_csv(index=False).encode(),
-                file_name=f"{pred_state.replace(' ','_')}_{pred_crime.replace(' ','_')}_forecast.csv",
-                mime="text/csv")
+                file_name=f"{pred_state.replace(' ','_')}_{pred_crime.replace(' ','_')}_forecast.csv",mime="text/csv")
         else:
             st.error("Model not available for this combination.")
 
-    # ── TAB 2: All States Overview ──────────────────────
     with tab_p2:
         st.markdown("<h3>📊 All States — Predictions & Risk Scores</h3>", unsafe_allow_html=True)
         sort_by = st.selectbox("Sort by",["Predicted Crimes ↓","Risk Score ↓","State Name ↑"],key="sort_pred")
@@ -1252,7 +879,7 @@ elif "AI Prediction" in menu:
         else:                              df_p = df_p.sort_values("STATE/UT")
 
         fig_all = go.Figure(go.Bar(
-            x=df_p["STATE_TITLE"], y=df_p["Predicted Crimes"],
+            x=df_p["STATE_TITLE"],y=df_p["Predicted Crimes"],
             marker=dict(color=df_p["Predicted Risk Score"],
                 colorscale=[[0,"#00cc44"],[0.4,"#ffcc00"],[1,"#ff0000"]],
                 colorbar=dict(title=dict(text="Risk Score",font=dict(color="#ffffff")),
@@ -1262,8 +889,7 @@ elif "AI Prediction" in menu:
             textposition='outside',textfont=dict(color='#ffffff',size=9,family='Arial Black'),
             hovertemplate='<b>%{x}</b><br>Predicted: %{y:,}<extra></extra>'))
         la = dark_layout("<b>All States — Predicted Total IPC Crimes</b>",h=520)
-        la["xaxis"]["tickangle"] = -45
-        del la["xaxis"]["dtick"]
+        la["xaxis"]["tickangle"] = -45; del la["xaxis"]["dtick"]
         fig_all.update_layout(**la)
         st.plotly_chart(fig_all, use_container_width=True)
 
@@ -1279,9 +905,7 @@ elif "AI Prediction" in menu:
         fig_risk.add_hline(y=25,line_color='#ffcc00',line_dash='dash',line_width=2,
             annotation_text="MEDIUM RISK",annotation_font_color="#ffcc00",annotation_font_size=12)
         lr = dark_layout("<b>Crime Volume vs Risk Score — All States</b>",h=520)
-        lr["xaxis"]["title"] = "Predicted Crimes"
-        lr["yaxis"]["title"] = "Risk Score"
-        del lr["xaxis"]["dtick"]
+        lr["xaxis"]["title"] = "Predicted Crimes"; lr["yaxis"]["title"] = "Risk Score"; del lr["xaxis"]["dtick"]
         fig_risk.update_layout(**lr)
         st.plotly_chart(fig_risk, use_container_width=True)
 
@@ -1289,25 +913,11 @@ elif "AI Prediction" in menu:
         disp_pred = df_p[["STATE_TITLE","Predicted Crimes","Predicted Risk Score","Risk Level"]].copy()
         disp_pred.columns = ["State/UT","Predicted Crimes","Risk Score","Risk Level"]
         disp_pred = disp_pred.reset_index(drop=True); disp_pred.index = disp_pred.index+1
-        styled_pred = disp_pred.style\
-            .background_gradient(cmap='RdYlGn_r',subset=["Predicted Crimes","Risk Score"])\
-            .set_properties(**{'color':'white','font-weight':'bold',
-                               '-webkit-text-fill-color':'white',
-                               'text-shadow':'1px 1px 4px rgba(0,0,0,0.9)',
-                               'background-color':'rgba(8,8,25,0.97)'})\
-            .set_properties(subset=["State/UT"],
-                **{'color':'white','font-weight':'900','-webkit-text-fill-color':'white',
-                   'background-color':'rgba(20,0,40,0.5)'})\
-            .set_properties(subset=["Risk Level"],
-                **{'color':'white','font-weight':'900','-webkit-text-fill-color':'white',
-                   'background-color':'rgba(20,0,40,0.5)'})
-        st.dataframe(styled_pred,use_container_width=True,height=520)
-        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+        render_dark_table(disp_pred, heat_cols=["Predicted Crimes","Risk Score"], height=520, show_index=True)
+        st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
         st.download_button("📥 Download All Predictions",
-            data=disp_pred.to_csv(index=False).encode(),
-            file_name="state_predictions_all.csv",mime="text/csv")
+            data=disp_pred.to_csv(index=False).encode(),file_name="state_predictions_all.csv",mime="text/csv")
 
-    # ── TAB 3: Future Timeline ──────────────────────────
     with tab_p3:
         st.markdown("<h3>🔮 Multi-State Crime Timeline — 2026 to 2035</h3>", unsafe_allow_html=True)
         ft1,ft2 = st.columns(2)
@@ -1323,17 +933,12 @@ elif "AI Prediction" in menu:
             tl_colors = ['#ff0000','#00ccff','#ffcc00','#00ff88','#cc00ff','#ff6600']
             for ci,st_name in enumerate(tl_states):
                 mk = (st_name,tl_crime)
-                if mk not in crime_models:
-                    continue
-                m = crime_models[mk]
-                preds = [float(m.predict([[y]])[0]) for y in future_yrs]
-                fig_tl.add_trace(go.Scatter(
-                    x=future_yrs, y=preds, mode='lines+markers',
-                    name=st_name.title(),
-                    line=dict(width=4,color=tl_colors[ci%6]),
+                if mk not in crime_models: continue
+                preds = [float(crime_models[mk].predict([[y]])[0]) for y in future_yrs]
+                fig_tl.add_trace(go.Scatter(x=future_yrs,y=preds,mode='lines+markers',
+                    name=st_name.title(),line=dict(width=4,color=tl_colors[ci%6]),
                     marker=dict(size=10,color=tl_colors[ci%6],line=dict(color='white',width=2)),
-                    hovertemplate=f'<b>{st_name.title()}</b><br>Year: %{{x}}<br>Forecast: %{{y:,}}<extra></extra>'
-                ))
+                    hovertemplate=f'<b>{st_name.title()}</b><br>Year: %{{x}}<br>Forecast: %{{y:,}}<extra></extra>'))
             ly_tl = dark_layout(f"<b>Crime Forecast Timeline 2026–2035 — {tl_crime.title()}</b>",h=520)
             del ly_tl["xaxis"]["dtick"]
             fig_tl.update_layout(**ly_tl)
@@ -1344,16 +949,11 @@ elif "AI Prediction" in menu:
             for st_name in tl_states:
                 mk = (st_name,tl_crime)
                 if mk not in crime_models: continue
-                m = crime_models[mk]
                 for y in future_yrs:
-                    rows.append({"State":st_name.title(),"Year":y,"Forecast":int(m.predict([[y]])[0])})
+                    rows.append({"State":st_name.title(),"Year":y,"Forecast":int(crime_models[mk].predict([[y]])[0])})
             tl_df = pd.DataFrame(rows).pivot(index="State",columns="Year",values="Forecast")
-            styled_tl = tl_df.style\
-                .background_gradient(cmap='Reds',axis=None)\
-                .set_properties(**{'color':'white','font-weight':'bold',
-                                   '-webkit-text-fill-color':'white',
-                                   'background-color':'rgba(8,8,25,0.97)'})
-            st.dataframe(styled_tl,use_container_width=True,height=300)
+            tl_df.columns = [str(c) for c in tl_df.columns]
+            render_pivot_table(tl_df, height=320)
             st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
             st.download_button("📥 Download Forecast Timeline",
                 data=tl_df.to_csv().encode(),file_name="forecast_timeline_2026_2035.csv",mime="text/csv")
@@ -1369,8 +969,7 @@ st.markdown("""
     <h3 style='color:#ff0000;margin-bottom:12px;font-size:1.5rem;'>🚨 CRIME INTELLIGENCE PRO 🚨</h3>
     <p style='color:#ffffff;font-size:1rem;font-weight:800;margin-bottom:6px;'>
         Professional Crime Analytics & Prediction Platform — India</p>
-    <p style='color:#cccccc;font-size:0.9rem;'>
-        AI/ML · Random Forest · Advanced Analytics Edition</p>
+    <p style='color:#cccccc;font-size:0.9rem;'>AI/ML · Random Forest · Advanced Analytics Edition</p>
     <p style='color:#aaaaaa;font-size:0.8rem;margin-top:8px;'>
         34 States/UTs · 10 Crime Categories · 2001–2012 · 3 Trained ML Models · Forecast up to 2035</p>
 </div>""", unsafe_allow_html=True)
